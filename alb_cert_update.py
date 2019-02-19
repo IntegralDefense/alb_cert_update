@@ -40,7 +40,7 @@ class ElbHandler:
         self.listener = ALB_LISTENER_ARN
 
     def add_listener_certificate(self, cert_arn, default=True):
-        """ Adds certificate to an ELB listener.
+        """ Adds certificate..
 
         Parameters:
             cert_arn (str): AWS ARN of the certificate from the
@@ -56,10 +56,36 @@ class ElbHandler:
         certs = [
             {
                 "CertificateArn": cert_arn,
-                "IsDefault": default,
+                #"IsDefault": default,
             }
         ]
         response = self._client.add_listener_certificates(
+            ListenerArn=self.listener,
+            Certificates=certs,
+        )
+        return response
+
+    def modify_listener(self, cert_arn, default=True):
+        """ Adds certificate to an ELB listener and sets it as the default cert.
+
+        Parameters:
+            cert_arn (str): AWS ARN of the certificate from the
+                AWS Certificate Manager.
+            default (bool): Sets the certificate to default cert
+                on the listener if True.
+
+        Returns:
+            response (dict): Dictionary containing certificates from
+                boto3 library.
+        """
+
+        certs = [
+            {
+                "CertificateArn": cert_arn,
+                #"IsDefault": default,
+            }
+        ]
+        response = self._client.modify_listener(
             ListenerArn=self.listener,
             Certificates=certs,
         )
@@ -154,7 +180,7 @@ def main():
 
     acm.import_certificate()
 
-    response = elb.add_listener_certificate(acm.arn)
+    response = elb.modify_listener(acm.arn)
 
     logger.info(f"Cert added to listener {elb.listener}:\n{response}")
 
