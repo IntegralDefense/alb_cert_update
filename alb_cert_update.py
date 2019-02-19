@@ -1,6 +1,6 @@
 import boto3
 from loguru import logger
-import pem
+#import pem
 
 from config import (
     AWS_ACCESS_KEY_ID,
@@ -14,8 +14,13 @@ from config import (
 
 
 def _read_pem_file(pem_file):
-    cert = pem.parse_file(pem_file)
-    return cert.as_bytes()
+    # ElbHanler just needs a byte string or a file handle
+    # pem breakes pem files into list of contained certs but we don't need that
+    # as we're explicitly passing in what we need from the config file
+    #cert = pem.parse_file(pem_file)
+    with open(pem_file, 'rb') as fp:
+        result = fp.read()
+    return result
 
 
 class ElbHandler:
